@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KABRA — Notebooks</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #08090D;
+  --bg2:       #0D1018;
+  --bg3:       #111420;
+  --surface:   #161A26;
+  --border:    #1E2436;
+  --border2:   #252C40;
+  --text:      #C8CEDC;
+  --text-mid:  #7A8399;
+  --text-dim:  #3D4560;
+  --accent:    #E8E0CC;
+
+  --c-phil:    #C8A96E;
+  --c-geo:     #6EC8A9;
+  --c-sys:     #6E9EC8;
+  --c-wave:    #A96EC8;
+  --c-tech:    #C86E6E;
+  --c-misc:    #6E8CC8;
+
+  --mono:      'DM Mono', monospace;
+  --serif:     'Playfair Display', Georgia, serif;
+  --sans:      'Syne', sans-serif;
+
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--mono);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Grain overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: var(--grain);
+  background-repeat: repeat;
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0.6;
+}
+
+/* Subtle grid */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── LAYOUT ── */
+.wrap { max-width: 1100px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 1; }
+
+/* ── NAV ── */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(8,9,13,0.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+}
+
+.nav-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-logo {
+  font-family: var(--sans);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.nav-sub {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.nav-link {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--text-mid);
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: color 0.2s;
+  background: none;
+  border: none;
+}
+.nav-link:hover { color: var(--accent); }
+.nav-link.active { color: var(--accent); }
+
+/* ── HERO ── */
+.hero {
+  padding: 80px 0 60px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(200,169,110,0.04) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 5px;
+  color: var(--c-phil);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  opacity: 0;
+  animation: fadeUp 0.6s 0.1s forwards;
+}
+
+.hero-title {
+  font-family: var(--serif);
+  font-size: clamp(36px, 6vw, 72px);
+  font-weight: 400;
+  line-height: 1.1;
+  color: var(--accent);
+  margin-bottom: 20px;
+  opacity: 0;
+  animation: fadeUp 0.6s 0.2s forwards;
+}
+
+.hero-title em {
+  font-style: italic;
+  color: var(--text-mid);
+}
+
+.hero-desc {
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--text-mid);
+  max-width: 560px;
+  opacity: 0;
+  animation: fadeUp 0.6s 0.3s forwards;
+}
+
+.hero-meta {
+  margin-top: 32px;
+  display: flex;
+  gap: 32px;
+  opacity: 0;
+  animation: fadeUp 0.6s 0.4s forwards;
+}
+
+.hero-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hero-stat-num {
+  font-family: var(--sans);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.hero-stat-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+/* ── CATEGORIES BAR ── */
+.cats-bar {
+  padding: 24px 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.cat-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-right: 8px;
+}
+
+.cat-btn {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 2px;
+  border: 1px solid transparent;
+  background: var(--surface);
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--text-mid);
+}
+
+.cat-btn:hover { border-color: var(--border2); color: var(--accent); }
+.cat-btn.active { color: var(--bg); font-weight: 500; }
+
+.cat-btn[data-cat="all"].active        { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+.cat-btn[data-cat="philosophy"].active { background: var(--c-phil); border-color: var(--c-phil); }
+.cat-btn[data-cat="geometry"].active   { background: var(--c-geo);  border-color: var(--c-geo);  }
+.cat-btn[data-cat="systems"].active    { background: var(--c-sys);  border-color: var(--c-sys);  }
+.cat-btn[data-cat="waves"].active      { background: var(--c-wave); border-color: var(--c-wave); }
+.cat-btn[data-cat="technology"].active { background: var(--c-tech); border-color: var(--c-tech); }
+
+/* category dot colors */
+.dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; margin-right: 6px; flex-shrink: 0; }
+.dot-philosophy { background: var(--c-phil); }
+.dot-geometry   { background: var(--c-geo);  }
+.dot-systems    { background: var(--c-sys);  }
+.dot-waves      { background: var(--c-wave); }
+.dot-technology { background: var(--c-tech); }
+.dot-misc       { background: var(--c-misc); }
+
+/* ── MAIN GRID ── */
+#blog-view { padding: 48px 0; }
+
+.featured-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 4px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+
+/* Featured article */
+.article-featured {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border: 1px solid var(--border);
+  margin-bottom: 2px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  background: var(--bg2);
+}
+.article-featured:hover { border-color: var(--border2); }
+
+.featured-visual {
+  background: var(--bg3);
+  padding: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+  min-height: 280px;
+}
+
+.featured-glyph {
+  font-family: var(--serif);
+  font-size: 120px;
+  font-style: italic;
+  color: rgba(200,169,110,0.08);
+  line-height: 1;
+  user-select: none;
+  position: absolute;
+}
+
+.featured-symbol {
+  font-size: 48px;
+  color: var(--c-phil);
+  opacity: 0.6;
+  position: relative;
+  z-index: 1;
+}
+
+.featured-content {
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.featured-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.featured-cat {
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.featured-date {
+  font-family: var(--mono);
+  font-size: 8px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+}
+
+.featured-title {
+  font-family: var(--serif);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+
+.featured-excerpt {
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--text-mid);
+  flex: 1;
+}
+
+.featured-footer {
+  margin-top: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.read-time {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+}
+
+.read-link {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--accent);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Grid articles */
+.articles-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  margin-bottom: 2px;
+}
+
+.article-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  padding: 28px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 220px;
+}
+.article-card:hover {
+  border-color: var(--border2);
+  background: var(--surface);
+  transform: translateY(-2px);
+}
+
+.card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-cat {
+  display: flex;
+  align-items: center;
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.card-date {
+  font-family: var(--mono);
+  font-size: 8px;
+  color: var(--text-dim);
+}
+
+.card-title {
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--accent);
+  flex: 1;
+}
+
+.card-excerpt {
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 1.65;
+  color: var(--text-mid);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+}
+
+.card-read {
+  font-family: var(--mono);
+  font-size: 8px;
+  color: var(--text-dim);
+}
+
+/* ── ARTICLE VIEW ── */
+#article-view {
+  display: none;
+  padding: 48px 0 96px;
+  max-width: 720px;
+}
+
+.back-btn {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--text-mid);
+  text-transform: uppercase;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 48px;
+  background: none;
+  border: none;
+  transition: color 0.2s;
+}
+.back-btn:hover { color: var(--accent); }
+
+.article-header { margin-bottom: 48px; }
+
+.article-cat-line {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.article-cat-tag {
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.article-date-tag {
+  font-family: var(--mono);
+  font-size: 8px;
+  color: var(--text-dim);
+}
+
+.article-title {
+  font-family: var(--serif);
+  font-size: clamp(28px, 4vw, 48px);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--accent);
+  margin-bottom: 20px;
+}
+
+.article-subtitle {
+  font-family: var(--serif);
+  font-size: 18px;
+  font-style: italic;
+  color: var(--text-mid);
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+.article-divider {
+  width: 48px;
+  height: 1px;
+  background: var(--border2);
+  margin-bottom: 40px;
+}
+
+.article-body {
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.85;
+  color: var(--text);
+}
+
+.article-body p { margin-bottom: 24px; }
+
+.article-body h2 {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  margin: 48px 0 16px;
+}
+
+.article-body h3 {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent);
+  margin: 36px 0 12px;
+}
+
+.article-body blockquote {
+  border-left: 2px solid var(--c-phil);
+  padding: 16px 24px;
+  margin: 32px 0;
+  background: var(--surface);
+  font-style: italic;
+  color: var(--text-mid);
+  font-size: 16px;
+}
+
+.article-body code {
+  font-family: var(--mono);
+  font-size: 13px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 2px 8px;
+  color: var(--c-sys);
+}
+
+.article-body .note {
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--text-mid);
+  border: 1px solid var(--border);
+  padding: 16px 20px;
+  margin: 24px 0;
+  background: var(--bg3);
+}
+
+/* ── LOAD MORE ── */
+.load-more {
+  text-align: center;
+  padding: 32px 0;
+}
+
+.load-btn {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 12px 32px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.load-btn:hover { border-color: var(--border2); color: var(--accent); }
+
+/* ── FOOTER ── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 32px;
+  text-align: center;
+}
+
+footer p {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.card-anim {
+  opacity: 0;
+  animation: fadeUp 0.5s forwards;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .article-featured { grid-template-columns: 1fr; }
+  .featured-visual { display: none; }
+  .articles-grid { grid-template-columns: 1fr; }
+  .hero-meta { gap: 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div>
+      <div class="nav-logo" onclick="showBlog()">KABRA</div>
+      <div class="nav-sub">Notebooks</div>
+    </div>
+    <div class="nav-right">
+      <button class="nav-link active" onclick="showBlog()">Index</button>
+      <button class="nav-link" onclick="showAbout()">About</button>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <section class="hero" id="hero-section">
+    <div class="hero-bg"></div>
+    <div class="hero-label">Notebooks — KABRA · Duomo Group</div>
+    <h1 class="hero-title">Thoughts from<br><em>the notebooks.</em></h1>
+    <p class="hero-desc">Philosophy. Geometry. Systems. Waves. These are transcriptions from physical notebooks accumulated over years — raw thinking made legible. Not articles. Transmissions.</p>
+    <div class="hero-meta">
+      <div class="hero-stat">
+        <div class="hero-stat-num" id="total-count">6</div>
+        <div class="hero-stat-label">Entries</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">5</div>
+        <div class="hero-stat-label">Categories</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">∞</div>
+        <div class="hero-stat-label">Notebooks pending</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BLOG VIEW -->
+  <div id="blog-view">
+
+    <!-- CATEGORIES -->
+    <div class="cats-bar">
+      <span class="cat-label">Filter —</span>
+      <button class="cat-btn active" data-cat="all" onclick="filterCat('all', this)">All</button>
+      <button class="cat-btn" data-cat="philosophy" onclick="filterCat('philosophy', this)">Philosophy</button>
+      <button class="cat-btn" data-cat="geometry" onclick="filterCat('geometry', this)">Geometry</button>
+      <button class="cat-btn" data-cat="systems" onclick="filterCat('systems', this)">Systems</button>
+      <button class="cat-btn" data-cat="waves" onclick="filterCat('waves', this)">Waves</button>
+      <button class="cat-btn" data-cat="technology" onclick="filterCat('technology', this)">Technology</button>
+    </div>
+
+    <!-- ARTICLES CONTAINER -->
+    <div id="articles-container" style="padding-top:40px;"></div>
+
+  </div>
+
+  <!-- ARTICLE VIEW -->
+  <div id="article-view">
+    <button class="back-btn" onclick="showBlog()">← Back to index</button>
+    <div id="article-content"></div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>KABRA · Duomo Group · Toulouse · syntasys-labs.com · All waves, all forms</p>
+</footer>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const ARTICLES = [
+  {
+    id: 1,
+    featured: true,
+    cat: "philosophy",
+    title: "The Strange Loop of Identity",
+    subtitle: "On KABRA, Gödel, and the recursion that produces consciousness from a single word.",
+    date: "Feb 2026",
+    readTime: "8 min",
+    symbol: "∮",
+    excerpt: "A father points at an animal and says a word. Decades later, that word has folded back on itself so many times it has become a person, a structure, a research programme. This is not metaphor. This is the precise mechanism Hofstadter described — the strange loop — where the lowest level and the highest level touch, and in that contact, something irreducible emerges.",
+    body: `
+      <p>A father points at an animal and says a word. <em>Eso es una cabra.</em> That is a goat. The child stores the word. The word carries with it a hidden etymology — <em>capra</em>, the one who climbs where others cannot, the animal that finds a path on vertical rock, that feeds where there is nothing.</p>
+
+      <h2>I. The recursion begins</h2>
+
+      <p>Gödel showed that any sufficiently complex formal system contains statements that refer to themselves — statements that cannot be proven or disproven from within the system. The system becomes aware of its own incompleteness. This is not a flaw. It is the condition for consciousness.</p>
+
+      <blockquote>"I am the statement that this system cannot prove."</blockquote>
+
+      <p>KABRA is this kind of statement. It refers to itself — it is the name of the person naming himself, derived from the name his ancestors gave to the animal they saw on the mountain, which described the behavior that would eventually produce him. The lowest level — a word, a goat, a father, an afternoon — touches the highest level — an identity, a research programme, a theory of semantic networks — and they become indistinguishable.</p>
+
+      <h2>II. Why perception is genetic</h2>
+
+      <p>Epigenetics has demonstrated that experience modifies gene expression without altering the DNA code itself. The experiences of previous generations change how the code is read. Not what it says — how it is interpreted. This means that perception itself has a genealogy. The way I see a system, sense its frictions, identify its hidden dependencies — this is not only my learning. It is the accumulated learning of everyone who came before me, compressed into how my nervous system processes the world.</p>
+
+      <div class="note">Note from notebook #3, undated: "What if the Modèle Utilisateur in Whole is doing computationally what epigenetics does biologically — accumulating the history of what was not wanted, so that the present query already carries the weight of all previous rejections? The negative gravity model is memory-as-geometry."</div>
+
+      <p>KABRA is not a personal identity. It is a familial frequency. The specific resonance produced by a lineage encountering this particular moment in history.</p>
+
+      <h2>III. The spiral, not the circle</h2>
+
+      <p>A circle returns to the same point. A spiral returns to the same angle but at a different altitude. The recursion in KABRA is a spiral — each loop covers the same territory but from higher ground. Banking was one loop. New Zealand was the exit to a larger loop. EY was one loop. The autoformation was the exit. Newrest was one loop. Duomo Group is the exit.</p>
+
+      <p>The pattern is not ambition. It is a structural property of the system. When the environment becomes too small to contain the thought, the system must expand or collapse. There was no choice in creating Duomo. There is never a choice at the inflection point — only the recognition that the loop has completed.</p>
+    `
+  },
+  {
+    id: 2,
+    featured: false,
+    cat: "geometry",
+    title: "The Toroid and the Nine Elements",
+    subtitle: "How a self-sustaining field requires exactly nine conductors.",
+    date: "Feb 2026",
+    readTime: "6 min",
+    symbol: "⊗",
+    excerpt: "A toroid generates a magnetic field that is self-contained — the energy circulates in a closed loop with minimal leakage. It is the most efficient form for maintaining a current. Three elements create the structure. Six more create the current. Without all nine, the field dissipates.",
+    body: `
+      <p>A toroid is a surface of revolution generated by a circle rotated around an external axis. Unlike a solenoid, whose field extends into space and dissipates, a toroidal field folds back into itself. The energy is not lost. It circulates.</p>
+
+      <h2>I. Why this geometry for a group structure</h2>
+
+      <p>Most organizational structures are hierarchical — trees, or occasionally networks. Trees are efficient for top-down information flow. Networks are efficient for lateral information flow. But neither is self-sustaining. A tree requires continuous energy input at the root. A network requires continuous energy input at every node.</p>
+
+      <p>A toroid is different. Once the current is established, it maintains itself. The field it generates is a consequence of the current, and the current is maintained by the field. This is the structure KABRA is trying to build — not a company that requires constant external energy to stay alive, but a system where each element feeds the next in a closed loop.</p>
+
+      <h2>II. The three structural elements</h2>
+
+      <p>Duomo — the vision, the axis around which the torus rotates. Not in the loop itself, but the reason the loop has its shape.</p>
+      <p>Lexer — the incoming flux, the revenue, the energy that enters the system.</p>
+      <p>Syntasys — the transformation, where incoming energy becomes new form.</p>
+
+      <blockquote>Structure without current generates no field. The loop must be completed.</blockquote>
+
+      <h2>III. The six conductors</h2>
+
+      <p>Dataset — the memory that makes the system learn. The corpus that cannot be duplicated because it was produced by this specific loop and no other.</p>
+      <p>Reputation — the external field, weak but real. Attracts without pushing. Built by intellectual artefacts, not marketing.</p>
+      <p>Proprietary code — transforms vision into tangible asset. Proof of capacity and barrier to entry simultaneously.</p>
+      <p>Human network — the junctions between spires. Each connection transmits current between elements.</p>
+      <p>Structured time — the frequency that transforms energy into coherent signal. Without rhythm, current becomes noise.</p>
+      <p>Proof of delivery — the resistance that stabilizes the circuit. Prevents the system from collapsing into pure theory.</p>
+
+      <div class="note">The complete toroid: Duomo at center — not in the loop but the axis. Lexer and Syntasys as the primary spires. Dataset, Reputation, Code, Network, Time, and Proof as the six conducting elements that complete the current.</div>
+    `
+  },
+  {
+    id: 3,
+    featured: false,
+    cat: "systems",
+    title: "Tribal Knowledge and the Ghost Dependency Problem",
+    subtitle: "Why migrations fail at the level of what was never written down.",
+    date: "Feb 2026",
+    readTime: "5 min",
+    symbol: "⌬",
+    excerpt: "Every system that has been running for more than five years contains knowledge that exists nowhere in the documentation. It exists in the nervous systems of the people who built it. When those people leave, the knowledge does not leave with them — it stays in the system as invisible load-bearing structure. This is what kills migrations.",
+    body: `
+      <p>In 2022, a major airline catering company attempted to migrate its core operational ERP to a new platform. The migration was technically sound. The data models were clean. The integrations were tested. Six months after go-live, three critical edge cases in the flight loading logic began producing errors that cost the company hundreds of thousands of euros per week.</p>
+
+      <p>The edge cases were not bugs. They were business rules that had been implemented in 2009 by an engineer who had retired in 2018. The rules were never documented because to the engineer who wrote them, they were obvious — they reflected a specific operational constraint of a specific airport that the system had been accommodating silently for thirteen years.</p>
+
+      <h2>I. The archaeology of a running system</h2>
+
+      <p>A system that has been in production for more than five years is not software. It is a palimpsest — a manuscript that has been written over many times, where traces of earlier writing bleed through. The current behavior of the system is the sum of every decision made by every person who ever touched it, including decisions that were made for reasons that no longer exist.</p>
+
+      <blockquote>The ghost dependency is not a bug. It is history made structural.</blockquote>
+
+      <p>Standard migration methodology treats this as a documentation problem — if you document everything thoroughly before migration, you capture all the tribal knowledge. This is wrong. Tribal knowledge cannot be fully documented because the people who hold it do not know they hold it. They have internalized it to the point where it is no longer a rule — it is a reflex.</p>
+
+      <h2>II. The Forensic Mapping approach</h2>
+
+      <p>The correct approach treats the running system as a primary source — not the documentation. You map the actual behavior of the system under production load, identify the points of heat, the data flow anomalies, the places where the system does something that the documentation does not predict. These are the locations of tribal knowledge.</p>
+
+      <p>This is what the SYNAPSE engine does. It does not read documentation. It reads the system as it actually runs — data flows, transformation patterns, timing dependencies, error handling behavior. It produces a fracture map: here is what is standard, here is what is tribal.</p>
+
+      <div class="note">From notebook #7: "The fracture function F(t) isolates tribal logic by identifying behavior that cannot be derived from the stated requirements. If the system does X when the requirements say nothing about X, then X is tribal. The tribe that knew why X was necessary may no longer exist."</div>
+    `
+  },
+  {
+    id: 4,
+    featured: false,
+    cat: "waves",
+    title: "Everything Is Wave Manipulation",
+    subtitle: "The unifying principle beneath sound, light, data, and meaning.",
+    date: "Jan 2026",
+    readTime: "7 min",
+    symbol: "∿",
+    excerpt: "Sound is a pressure wave. Light is an electromagnetic wave. Data is a signal — variations of state in time. A semantic network is a field of attraction — gradients, frequencies of occurrence, harmonics between concepts. Consciousness, in the most serious neuroscientific models, is described as synchronization of oscillatory frequencies between brain regions. These are not metaphors.",
+    body: `
+      <p>When I say that everything is wave manipulation, I am not speaking poetically. I am describing a structural unity that runs from the physics of sound through the mathematics of Fourier transforms to the architecture of semantic networks.</p>
+
+      <h2>I. The Fourier insight</h2>
+
+      <p>Fourier showed that any complex signal — any wave of arbitrary shape — can be decomposed into a sum of simple sine waves of different frequencies and amplitudes. This is not a mathematical trick. It reveals something fundamental about the structure of information: complexity is always the superposition of simpler frequencies.</p>
+
+      <p>A chord is three sine waves playing simultaneously. The emotional quality of the chord is a property of the ratio between the frequencies — the harmony or dissonance that emerges from their interaction. The chord does not exist in any single wave. It exists in the relationship between them.</p>
+
+      <blockquote>The semantic cluster network in Whole operates on the same principle. The meaning of a query does not exist in any single node. It exists in the attractor dynamics — the gravitational relationships between clusters, which are the semantic equivalent of harmonic ratios.</blockquote>
+
+      <h2>II. The cymatics connection</h2>
+
+      <p>Cymatics is the study of visible sound — the geometric patterns that form in matter when specific frequencies are applied. A circular plate covered in sand, vibrated at 432 Hz, produces a mandala. At 528 Hz, a different mandala. The frequency does not describe the shape — the frequency <em>is</em> the shape, in a medium that can hold form.</p>
+
+      <p>The Surfing Engine in Whole operates on this principle. A semantic vector — a high-dimensional description of what a piece of content means — is projected into a representational space through a learned transformation matrix. The transformation is analogous to the physical medium. The same semantic content projected into a flat text space produces an article. Projected into a 3D spatial space produces an environment. The content is the frequency. The representation is the shape it takes in a given medium.</p>
+
+      <h2>III. Music as the oldest computational system</h2>
+
+      <p>Before formal logic, before written language, before mathematics as a discipline, there was music — structured manipulation of frequencies in time. The rules of counterpoint, developed over centuries, are a computational system for managing the relationships between simultaneous voices. Bach's fugues are not composed — they are generated by recursive application of transformation rules to a seed theme.</p>
+
+      <div class="note">The connection between music theory and the architecture of Whole is not decorative. The fugue structure — a theme that returns transformed at each iteration — is precisely the structure of the User Model in Whole. Each interaction returns the query transformed, carrying the weight of all previous rejections. The negative gravity model is counterpoint applied to semantic space.</div>
+    `
+  },
+  {
+    id: 5,
+    featured: false,
+    cat: "technology",
+    title: "The 2030 Inflection and Where to Be",
+    subtitle: "On exponential curves, spatial computing, and the New Space economy.",
+    date: "Jan 2026",
+    readTime: "5 min",
+    symbol: "↗",
+    excerpt: "We are in the most explosive part of the exponential curve. The scientific community has done the mathematics. Something is arriving in 2030 — not as a single event, but as a threshold crossing where the rate of change exceeds the adaptive capacity of institutions built for a slower world.",
+    body: `
+      <p>Exponential growth is perceptually deceptive. For most of its length, it looks linear. The doublings are happening, but they are happening in the small numbers — from 1 to 2, from 2 to 4, from 4 to 8. These are barely noticeable. Then the doublings reach the large numbers — from 512 to 1024, from 1024 to 2048 — and the curve appears to go vertical. Nothing has changed in the mathematics. Everything has changed in the experience.</p>
+
+      <h2>I. Where we are on the curve</h2>
+
+      <p>We are at the inflection point — the moment where the curve begins to appear vertical to the people living inside it. AI capabilities, cloud computation, data sovereignty regulation, spatial computing, the dematerilaization of economic infrastructure — these are not separate trends. They are the same doubling seen from different angles.</p>
+
+      <blockquote>The question is not whether the inflection is happening. The question is where to be positioned when the curve becomes visible to everyone simultaneously.</blockquote>
+
+      <h2>II. The New Space opportunity</h2>
+
+      <p>Space is the domain where all the exponential trends converge at maximum intensity. Satellite constellations generate data at a scale that requires new infrastructure for distribution, provenance, and semantic organization. The New Space economy is building the equivalent of the early internet — the infrastructure is being laid, the protocols are not yet standardized, the architectural decisions being made now will be load-bearing for decades.</p>
+
+      <p>Toulouse is not an accident. The European space research hub, CNES, Airbus Defence and Space, Thales Alenia Space — these are organizations confronting exactly the data complexity that Whole addresses at the protocol level. Being here, building this, now — this is not coincidence. It is the correct position on the curve.</p>
+
+      <div class="note">From notebook #11: "The person who builds the semantic infrastructure for distributed satellite data will do for space what TCP/IP did for terrestrial networks. The opportunity is not in building satellites. It is in building the language they speak to each other."</div>
+    `
+  },
+  {
+    id: 6,
+    featured: false,
+    cat: "philosophy",
+    title: "On Leaving Comfortable Positions",
+    subtitle: "The geometry of voluntary rupture as a method of knowing.",
+    date: "Dec 2025",
+    readTime: "4 min",
+    symbol: "◈",
+    excerpt: "Every significant departure in my life has been described by others as a risk. Leaving banking for New Zealand. Leaving EY stability for an independent formation. Leaving Newrest to build. Each time, the people around me saw discontinuity. I saw the completion of a loop and the beginning of a larger one.",
+    body: `
+      <p>There is a particular discomfort that arrives when the environment you are in becomes too small for the thinking you need to do. It is not unhappiness. It is a kind of cognitive pressure — the sensation of a thought that cannot complete itself within the available space.</p>
+
+      <h2>I. The loop completion signal</h2>
+
+      <p>I have come to recognize this pressure as a signal, not a problem. It means the current loop has run to completion. The lessons have been extracted. The system has been understood to the depth that this context allows. The next level of understanding requires a different context.</p>
+
+      <blockquote>The question is never whether to leave. The question is whether you have extracted everything this loop had to teach before you go.</blockquote>
+
+      <p>Leaving banking in 2017 was not an escape from finance. It was the completion of a loop in which I had learned everything I needed to learn about organizational structures, capital flows, and the gap between how institutions present themselves and how they actually function. The loop was complete. The pressure appeared. New Zealand was the next loop.</p>
+
+      <h2>II. The algorithm</h2>
+
+      <p>I have applied the same algorithm to my own development that I apply to the systems I work on: identify the friction points, propose improvements, implement, measure, iterate. When the system has been optimized to the limit of what the current architecture allows, do not continue optimizing. Redesign the architecture.</p>
+
+      <p>This is not ambition in the conventional sense. It is a structural property — the same impulse that drives biological evolution, the same impulse that drives scientific paradigm shifts. The current form runs until it reaches the limit of its adaptive capacity. Then the form changes.</p>
+
+      <div class="note">The self-improvement algorithm applied recursively to a career produces the same result as gradient descent applied recursively to a neural network — convergence toward a local or global optimum, depending on the learning rate and the shape of the loss landscape. The voluntary ruptures are the moments of stepping out of a local minimum to explore whether there is a deeper basin nearby.</div>
+    `
+  }
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let currentCat = 'all';
+let currentArticle = null;
+
+// ── CAT COLORS ────────────────────────────────────────────────────────────────
+const CAT_COLORS = {
+  philosophy: 'var(--c-phil)',
+  geometry:   'var(--c-geo)',
+  systems:    'var(--c-sys)',
+  waves:      'var(--c-wave)',
+  technology: 'var(--c-tech)',
+  misc:       'var(--c-misc)',
+};
+
+// ── FILTER ────────────────────────────────────────────────────────────────────
+function filterCat(cat, btn) {
+  currentCat = cat;
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderArticles();
+}
+
+// ── RENDER BLOG ───────────────────────────────────────────────────────────────
+function renderArticles() {
+  const filtered = currentCat === 'all'
+    ? ARTICLES
+    : ARTICLES.filter(a => a.cat === currentCat);
+
+  const container = document.getElementById('articles-container');
+  container.innerHTML = '';
+
+  if (!filtered.length) {
+    container.innerHTML = `<p style="font-family:var(--mono);font-size:11px;color:var(--text-dim);padding:40px 0;">No entries in this category yet.</p>`;
+    return;
+  }
+
+  const featured = filtered.find(a => a.featured) || filtered[0];
+  const rest = filtered.filter(a => a.id !== featured.id);
+
+  // Featured
+  const fEl = document.createElement('div');
+  fEl.innerHTML = `
+    <div class="featured-label">— Featured entry</div>
+    <div class="article-featured card-anim" style="animation-delay:0.05s" onclick="openArticle(${featured.id})">
+      <div class="featured-visual">
+        <div class="featured-glyph">${featured.symbol}</div>
+        <div class="featured-symbol" style="color:${CAT_COLORS[featured.cat]}">${featured.symbol}</div>
+      </div>
+      <div class="featured-content">
+        <div>
+          <div class="featured-meta">
+            <span class="featured-cat" style="color:${CAT_COLORS[featured.cat]}">
+              <span class="dot dot-${featured.cat}"></span>${featured.cat}
+            </span>
+            <span class="featured-date">${featured.date}</span>
+          </div>
+          <div class="featured-title">${featured.title}</div>
+          <div class="featured-excerpt">${featured.excerpt}</div>
+        </div>
+        <div class="featured-footer">
+          <span class="read-time">${featured.readTime} read</span>
+          <span class="read-link">Read entry →</span>
+        </div>
+      </div>
+    </div>
+  `;
+  container.appendChild(fEl);
+
+  // Grid
+  if (rest.length) {
+    const grid = document.createElement('div');
+    grid.className = 'articles-grid';
+    grid.style.marginTop = '2px';
+
+    rest.forEach((a, i) => {
+      const card = document.createElement('div');
+      card.className = 'article-card card-anim';
+      card.style.animationDelay = `${0.1 + i * 0.05}s`;
+      card.onclick = () => openArticle(a.id);
+      card.innerHTML = `
+        <div class="card-meta">
+          <span class="card-cat" style="color:${CAT_COLORS[a.cat]}">
+            <span class="dot dot-${a.cat}"></span>${a.cat}
+          </span>
+          <span class="card-date">${a.date}</span>
+        </div>
+        <div class="card-title">${a.title}</div>
+        <div class="card-excerpt">${a.excerpt}</div>
+        <div class="card-footer">
+          <span class="card-read">${a.readTime} read</span>
+          <span style="font-family:var(--mono);font-size:9px;color:var(--text-dim);">→</span>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+
+    container.appendChild(grid);
+  }
+
+  document.getElementById('total-count').textContent = ARTICLES.length;
+}
+
+// ── OPEN ARTICLE ──────────────────────────────────────────────────────────────
+function openArticle(id) {
+  const a = ARTICLES.find(x => x.id === id);
+  if (!a) return;
+
+  currentArticle = a;
+
+  document.getElementById('blog-view').style.display = 'none';
+  document.getElementById('hero-section').style.display = 'none';
+
+  const view = document.getElementById('article-view');
+  view.style.display = 'block';
+
+  const color = CAT_COLORS[a.cat];
+
+  document.getElementById('article-content').innerHTML = `
+    <div class="article-header">
+      <div class="article-cat-line">
+        <span class="article-cat-tag" style="color:${color}">
+          <span class="dot dot-${a.cat}"></span>${a.cat}
+        </span>
+        <span class="article-date-tag">${a.date} · ${a.readTime} read</span>
+      </div>
+      <h1 class="article-title">${a.title}</h1>
+      <p class="article-subtitle">${a.subtitle}</p>
+      <div class="article-divider"></div>
+    </div>
+    <div class="article-body">${a.body}</div>
+  `;
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── SHOW BLOG ─────────────────────────────────────────────────────────────────
+function showBlog() {
+  document.getElementById('article-view').style.display = 'none';
+  document.getElementById('blog-view').style.display = 'block';
+  document.getElementById('hero-section').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showAbout() {
+  openArticle(1);
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+renderArticles();
+</script>
+</body>
+</html>
